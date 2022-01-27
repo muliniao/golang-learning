@@ -1,0 +1,6 @@
+1.计数器不能为负数
+    wg.Add(-1)
+2.WaitGroup必须传地址,不能是引用类型
+    func f (i int, wg *sync.WaitGroup){}
+3.go func(// 形参) {} (// 实参)
+
