@@ -1,72 +1,67 @@
-1.简介
-(1)本质是队列,先进先出(FIFO)
-(2)线程安全,无需加锁
+1. 简介
+    1.1 本质是队列,先进先出(FIFO)
+    1.2 线程安全,无需加锁
+2. 声明/初始化
+    2.1 var 变量名 chan 数据类型:
+        2.1.1 var personChan chan *Person
+        2.1.2 var mapChan chan map[string]*Person
+    2.2 personChan := make(chan *Person, 3)
+3. 操作数据
+    3.1 personChan <- &Person
+    3.2 rocket := <- personChan
+4. 遍历和关闭
+    4.1 close channel后,不可再写入数据,但仍可读取
+    4.2 for-range遍历时,如channel未关闭,则会deadlock
+    4.3 for-range遍历时,如channel关闭,则可正常完成遍历
+5. 并发相关
+    5.1 channel是goroutine间通信和同步的重要组件
+    5.2 golang通过通信来共享内存, channel载体
+    5.3 无缓冲通道: 既可用于通信,也可用于两个goroutine的同步
+        5.3.1 make(chan dataType)
+        5.3.2 (1) 同步操作 (2) 直接阻塞 (3) 接收双方配对后,开始传送
+    5.4 有缓冲通道: 主要用于通信
+        5.4.1 make(chan dataType, 10)
+        5.4.2 (1) 异步操作 (2) 满了阻塞发送 (3) 空了阻塞接收 (4) 比非缓存通道多了放置和移出操作
+6. 注意事项
+    6.1 只能存放指定数据类型
+    6.2 panic
+        6.2.1 向关闭的通道写入数据 (panic: send on closed channel)
+        6.2.2 重复关闭通道 (panic: close of closed channel)
+    6.3 deadlock
+        6.3.1 未初始化的通道,写和读都会deadlock
+        6.3.2 通道放满,写入数据会deadlock
+        6.3.3 通道中无数据,读取数据会deadlock
+    6.4 只写channel: var intChan chan <- int
+        只读channel: var intChan <- chan int
+            *注:实际应用(需补充demo)
+            func send(ch chan<- int, exitChan chan struct{}) {} : 只写
+            func recv(ch <-chan int, exitChan chan struct{}) {} : 只读
+    6.5 使用recover来解决panic的问题
+    6.6 判断是否能从channel中取到数据, 或channel是否关闭(取完后,返回类型为nil的值, ok为false)
+        num, ok := <- intChan
+        if !ok {
+            break
+        }
 
-2.声明/初始化
-(1)var 变量名 chan 数据类型:
-    - var personChan chan *Person
-    - var mapChan chan map[string]*Person
-(2)personChan := make(chan *Person, 3)
-
-3.操作数据
-(1)personChan <- &Person
-(2)rocket := <- personChan
-
-4.遍历和关闭
-(1)close channel后,不可再写入数据,但仍可读取
-(2)for-range遍历时,如channel未关闭,则会deadlock
-(3)for-range遍历时,如channel关闭,则可正常完成遍历
-
-5.并发相关
-(1)channel是goroutine间通信和同步的重要组件
-(2)golang通过通信来共享内存, channel载体
-(3)无缓冲通道: 既可用于通信,也可用于两个goroutine的同步
-    - make(chan dataType)
-    - 1. 同步操作 2. 直接阻塞 3. 接收双方配对后,开始传送
-(4)有缓冲通道: 主要用于通信
-    - make(chan dataType, 10)
-    - 1. 异步操作 2. 满了阻塞发送 3. 空了阻塞接收 4. 比非缓存通道多了放置和移出操作
-
-6.注意事项
-(1)只能存放指定数据类型
-(2)panic
-    -向关闭的通道写入数据 (panic: send on closed channel)
-    -重复关闭通道 (panic: close of closed channel)
-(3)deadlock
-    -未初始化的通道,写和读都会deadlock
-    -通道放满,写入数据会deadlock
-    -通道中无数据,读取数据会deadlock
-(4)只写channel: var intChan chan <- int
-   只读channel: var intChan <- chan int
-*注:实际应用(需补充demo)
-    func send(ch chan<- int, exitChan chan struct{}) {} : 只写
-    func recv(ch <-chan int, exitChan chan struct{}) {} : 只读
-(5)使用recover来解决panic的问题
-(6)判断是否能从channel中取到数据, 或channel是否关闭(取完后,返回类型为nil的值, ok为false)
-    num, ok := <- intChan
-    if !ok {
-        break
+7. for-select相关
+    7.1 基本用发
+    select {
+        case <-chanl:       //检测有无数据可以读
+            do something    //如果chanl成功读取到数据，则进行该case处理语句
+        case chan2 <- 1:    //检测有没有可以写
+            do something    //如果成功向chan2写入数据，则进行该case处理语句
+        default:            //假如没有default，那么在以上两个条件都不成立的情况下，就会在此阻塞
+            do final        //如果以上都没有符合条件，那么则进行default处理流程
     }
 
-7.for-select相关
-(1)基本用发
-select {
-    case <-chanl:       //检测有无数据可以读
-        do something    //如果chanl成功读取到数据，则进行该case处理语句
-    case chan2 <- 1:    //检测有没有可以写
-        do something    //如果成功向chan2写入数据，则进行该case处理语句
-    default:            //假如没有default，那么在以上两个条件都不成立的情况下，就会在此阻塞
-        do final        //如果以上都没有符合条件，那么则进行default处理流程
-}
-
-(2)知识点
-1.顺序: 自上而下,从左到右
-2.如同时多个case分支满足条件时,随机选一条执行
-3.如无case分支满足条件时
-    - 有default: 执行default语句
-    - 无default: select语句被阻塞,直到至少一个case分支可进行下去
-4.如在select语句中发现某个通道已关闭，那么应该怎样屏蔽掉它所在的分支
-    - 当第二个boolean参数为false的时候，在相应的case中设置chan为nil零值，再次case求值的时候会遭遇阻塞，会屏蔽该case(见select004)
-5.如何退出外层for语句
-    - 在满足条件的case分支,直接return
-    - goto或break和label联用
+    7.2 知识点
+        7.2.1 顺序: 自上而下,从左到右
+        7.2.2 如同时多个case分支满足条件时,随机选一条执行
+        7.2.3 如无case分支满足条件时
+                - 有default: 执行default语句
+                - 无default: select语句被阻塞,直到至少一个case分支可进行下去
+        7.2.4 如在select语句中发现某个通道已关闭，那么应该怎样屏蔽掉它所在的分支
+                - 当第二个boolean参数为false的时候，在相应的case中设置chan为nil零值，再次case求值的时候会遭遇阻塞，会屏蔽该case(见select004)
+        7.2.5 如何退出外层for语句
+                - 在满足条件的case分支,直接return
+                - goto或break和label联用
