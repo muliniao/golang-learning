@@ -18,3 +18,37 @@
 
 (3)
 -写优先,仅限定于新reader,如果在writer请求锁时,已有reader持有锁,仍然需要等待持有锁的reader释放锁
+
+3. Cond
+    3.1 条件变量: 依赖锁, 观察, 共享资源状态, 事件通知
+    3.2 条件变量: 基于互斥锁的，它必须有互斥锁的支撑才能发挥作用
+    3.3 三个方法: wait, signal, broadcast
+    3.4 signal()和broadcast()的区别: signal只会唤醒一个被阻塞的goroutine, broadcast会唤醒所有goroutine
+   *3.5 使用for{}作为检查: 检查状态--->等待通知--->被唤醒
+   *3.6 wait方法主要做的四件事
+        3.6.1 把调用它的 goroutine（也就是当前的 goroutine）加入到当前条件变量的通知队列中
+        3.6.2 解锁当前的条件变量基于的那个互斥锁。
+        3.6.3 让当前的 goroutine 处于等待状态，等到通知到来时再决定是否唤醒它。此时，这个 goroutine 就会阻塞在调用这个Wait方法的那行代码上。
+        3.6.4 如果通知到来并且决定唤醒这个 goroutine，那么就在唤醒它之后重新锁定当前条件变量基于的互斥锁。自此之后，当前的 goroutine 就会继续执行后面的代码了。
+
+4. Atomic
+    4.1 支持数据类型
+        4.1.1 常规类型: int32, int64, uint32, uint64, uintptr, unsafe-pointer
+        4.1.2 自定义类型: Value
+    4.2 支持操作: add, compare and swap(CAS), load, store, swap
+    4.3 Atomic.Value (*重要)
+        4.3.1 操作: store, load, swap, compareAndSwap
+        4.3.2 Store数据二点原则: (1) 不能存nil (2) 只能存同类型数据
+        4.3.3 原子值尽量不对外暴露, 访问权限至少包级私有化
+        4.3.4 尽量不存引用类型的值
+        4.3.5 可用public函数让外界间接使用它, 但原子值不传递到外界(值本身或值的指针)
+        4.3.6 Store值时, 先进行类型判断, 否则系统会抛出panic
+       *4.3.7 将原子值封装到结构体,见案例5
+   *4.4 应用场景
+        4.4.1 简单场景下,使用atomic: 非引用类型数据都挺适用, 例子:全局计数, 全局配置
+                - 值类型:基本数据类型int系列, float系列, bool, string, 数组和结构体 struct
+                - 引用类型:指针, slice切片, map, 管道chan, interface等都是引用类型
+        4.4.2 复杂场景下,使用互斥锁
+
+
+
