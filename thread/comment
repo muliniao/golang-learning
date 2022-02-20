@@ -4,3 +4,11 @@
     func f (i int, wg *sync.WaitGroup){}
 3.go func(// 形参) {} (// 实参)
 
+4.多个goroutine间协同工作, 涉及4个方面(通信, 同步, 通知, 退出)
+    4.1 通信: channel
+    4.2 同步: channel
+    4.3 通知: context
+    4.4 退出: context
+
+
+
