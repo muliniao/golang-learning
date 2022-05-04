@@ -155,7 +155,7 @@ func main() {
 
 	log.Printf("Data read: %s\n", dataReadFile)
 
-	// 7. 使用緩存讀
+	// 7. ***使用緩存讀***(重要)
 	fileBufferRead, err := os.Open("test001.txt")
 	if err != nil {
 		log.Fatal(err)

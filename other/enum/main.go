@@ -2,38 +2,34 @@ package main
 
 import "fmt"
 
-type Season int
+type Season int32
 
 const (
-	Spring Season = iota
+	Spring Season = iota + 1
 	Summer
 	Autumn
 	Winter
 )
 
+var (
+	SeasonName = map[Season]string{
+		Spring: "Spring",
+		Summer: "Summer",
+		Autumn: "Autumn",
+		Winter: "Winter",
+	}
+
+	SeasonValue = map[string]Season{
+		"Spring": Spring,
+		"Summer": Summer,
+		"Autumn": Autumn,
+		"Winter": Winter,
+	}
+)
+
 // 返回实例名称
 func (s Season) name() string {
-	// 方案1
-	//switch s {
-	//case Spring:
-	//	return "spring"
-	//case Summer:
-	//	return "summer"
-	//case Autumn:
-	//	return "autumn"
-	//case Winter:
-	//	return "winter"
-	//default:
-	//	return "unknown"
-	//}
-
-	// 方案2
-	return [...]string{
-		"spring",
-		"summer",
-		"autumn",
-		"winter",
-	}[s]
+	return SeasonName[s]
 }
 
 func (s Season) ordinal() int {
@@ -52,6 +48,7 @@ func (s Season) valueOf() {
 func main() {
 
 	a := Winter
+	fmt.Println(a)
 	fmt.Println(a.name())
 
 }
