@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"Learning/golang-learning/thread/channel001"
+	"learning/golang-learning/thread/channel001"
 )
 
 const NUMBER = 10

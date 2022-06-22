@@ -1,4 +1,4 @@
-package waitgroup002
+package waitgroup_002
 
 import "sync"
 

@@ -66,7 +66,7 @@ func main() {
 - 一般来说，存在一组等待进程，P={P1，P2，…，PN}，P1 等待 P2 持有的资源，P2 等待 P3 持有的资源，依此类推，最后是 PN 等待 P1 持有的资源，这就形成了一个环路等待的死结
 
 
-# 功能扩展
+## 功能扩展
 1. 与基础数据结构组合
 ````go
 type SliceQueue struct {
@@ -99,7 +99,7 @@ func (q *SliceQueue) Dequeue() interface{} {
 }
 ````
 
-# 错误案例
+## 错误案例
 1. Docker issue [34811](https://github.com/moby/moby/pull/34881/files).
 ![screenshot](./assets/issue_34811.png)
 
@@ -110,5 +110,7 @@ func (q *SliceQueue) Dequeue() interface{} {
    ![screenshot](./assets/issue_62464.png)
 
      
-# 思考
+## 源码解析
+
+## 思考
 
