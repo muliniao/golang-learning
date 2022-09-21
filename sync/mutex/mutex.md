@@ -1,4 +1,4 @@
-# Mutex & RWMutex
+# Mutex & RWMutex(优先级高)
 
 ## 实现机制
 1. 使用互斥锁，限定临界区只能由一个线程持有
@@ -109,8 +109,13 @@ func (q *SliceQueue) Dequeue() interface{} {
    - 当这两个方法都请求写锁时，是获取不到的，因为 GetCPUSetOrDefault 方法还没有执行完，不会释放读锁，这就形成了死锁
    ![screenshot](./assets/issue_62464.png)
 
+## 总结
+
+
      
 ## 源码解析
+
+
 
 ## 思考
 
